@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // ⚠️ move this to .env in production
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY || "YOUR_RAPIDAPI_KEY";
@@ -596,23 +596,58 @@ app.get("/health", (req, res) => {
 });
 
 // ----------------------------------
-// Serve frontend (production)
+// Serve frontend (dev: Vite middleware, prod: static dist) — single port
 // ----------------------------------
-const distPath = path.join(__dirname, "..", "dist");
-app.use(express.static(distPath));
-app.get(/.*/, (req, res) => {
-  if (req.path.startsWith("/api") || req.path === "/health" || req.path === "/properties" || req.path.startsWith("/admin")) {
-    return res.status(404).json({ error: "Not found" });
+
+async function initFrontend() {
+  const isDev = process.env.NODE_ENV !== "production";
+
+  if (isDev) {
+    const vite = require("vite");
+    const viteServer = await vite.createServer({
+      root: path.resolve(__dirname, ".."),
+      server: {
+        middlewareMode: true,
+        host: true,
+      },
+    });
+
+    // Vite dev middleware serves the frontend + HMR through this same port
+    app.use(viteServer.middlewares);
+
+    // SPA fallback for client-side routes that Vite did not match
+    app.use((req, res) => {
+      if (res.headersSent) return;
+      res.status(200).sendFile(path.join(__dirname, "..", "index.html"));
+    });
+  } else {
+    const distPath = path.join(__dirname, "..", "dist");
+    app.use(express.static(distPath));
+    app.get(/.*/, (req, res) => {
+      if (
+        req.path.startsWith("/api") ||
+        req.path === "/health" ||
+        req.path === "/properties" ||
+        req.path.startsWith("/admin")
+      ) {
+        return res.status(404).json({ error: "Not found" });
+      }
+      res.sendFile(path.join(distPath, "index.html"), (err) => {
+        if (err) res.status(404).send("Not found");
+      });
+    });
   }
-  res.sendFile(path.join(distPath, "index.html"), (err) => {
-    if (err) res.status(404).send("Not found");
-  });
+}
+
+initFrontend().catch((err) => {
+  console.error("Failed to initialize frontend middleware:", err);
+  process.exit(1);
 });
 
 // ----------------------------------
-// Server
+// Server (single port: frontend + backend)
 // ----------------------------------
 
 app.listen(PORT, () => {
-  console.log(`KeyHaven API running on port ${PORT}`);
+  console.log(`KeyHaven server running on port ${PORT}`);
 });
