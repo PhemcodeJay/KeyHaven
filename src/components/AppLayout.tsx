@@ -11,7 +11,7 @@ import CTASection from './CTASection';
 import LoginModal from './LoginModal';
 import AdminDashboard from './AdminDashboard';
 import Footer from './Footer';
-import { SlidersHorizontal, ArrowUp } from 'lucide-react';
+import { SlidersHorizontal, ArrowUp, Phone } from 'lucide-react';
 
 const defaultFilters: PropertyFilters = {
   search: '',
@@ -27,6 +27,12 @@ const defaultFilters: PropertyFilters = {
   sort_by: 'date_listed',
   sort_order: 'desc',
 };
+
+// WhatsApp contact number (international format without +)
+// Update this with your actual WhatsApp number
+const WHATSAPP_NUMBER = '1234567890';
+
+const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=Hi%2C%20I%20am%20interested%20in%20a%20property%20on%20KeyHaven`;
 
 // Helper functions for data transformation - defined outside component to avoid initialization issues
 const determinePropertyType = (data: any): string => {
@@ -462,6 +468,17 @@ const AppLayout: React.FC<AppLayoutProps> = ({ listings = [], isLoading = false,
           <ArrowUp className="w-5 h-5" />
         </button>
       )}
+
+      {/* Floating WhatsApp Chat Button */}
+      <a
+        href={whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-20 w-12 h-12 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg shadow-green-500/30 flex items-center justify-center transition-all z-30 hover:scale-110"
+        title="Chat with us on WhatsApp"
+      >
+        <Phone className="w-6 h-6" />
+      </a>
     </div>
   );
 };
