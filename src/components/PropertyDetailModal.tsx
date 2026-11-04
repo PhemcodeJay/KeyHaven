@@ -32,6 +32,79 @@ const PropertyDetailModal: React.FC<PropertyDetailModalProps> = ({ property, onC
     }, 2000);
   };
 
+  const handleApplicationSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setApplicationSent(true);
+    // Mock API call - would send application to backend
+    setTimeout(() => {
+      setShowApplicationForm(false);
+      setApplication({
+        fullName: '',
+        email: '',
+        phone: '',
+        employment: '',
+        moveInDate: '',
+        occupants: 1,
+        pets: false,
+        leaseTerm: '12m',
+        messages: '',
+      });
+      setApplicationSent(false);
+    }, 2000);
+  };
+
+  // Rental Application State
+  const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [application, setApplication] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    employment: '',
+    moveInDate: '',
+    occupants: 1,
+    pets: false,
+    leaseTerm: '12m',
+    messages: '',
+  });
+  const [applicationSent, setApplicationSent] = useState(false);
+
+  const handleApplicationSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setApplicationSent(true);
+    // Mock API call - would send application to backend
+    setTimeout(() => {
+      setShowApplicationForm(false);
+      setApplication({
+        fullName: '',
+        email: '',
+        phone: '',
+        employment: '',
+        moveInDate: '',
+        occupants: 1,
+        pets: false,
+        leaseTerm: '12m',
+        messages: '',
+      });
+      setApplicationSent(false);
+    }, 2000);
+  };
+
+  // Rental Application State
+  const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [application, setApplication] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    employment: '',
+    moveInDate: '',
+    occupants: 1,
+    pets: false,
+    leaseTerm: '12m',
+    messages: '',
+  });
+  const [applicationSent, setApplicationSent] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState(0);
+
   const handleShare = () => {
     const url = window.location.href;
     navigator.clipboard.writeText(`${property.title} - ${formatPrice(property.price)}/${property.price_period} | ${url}`);
