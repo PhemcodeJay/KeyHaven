@@ -30,7 +30,7 @@ const defaultFilters: PropertyFilters = {
 
 // WhatsApp contact number (international format without +)
 // Update this with your actual WhatsApp number
-const WHATSAPP_NUMBER = '1234567890';
+const WHATSAPP_NUMBER = '+1234567890';
 
 const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=Hi%2C%20I%20am%20interested%20in%20a%20property%20on%20KeyHaven`;
 
@@ -117,7 +117,10 @@ interface AppLayoutProps {
 }
 
 const AppLayout: React.FC<AppLayoutProps> = ({ listings = [], isLoading = false, error = null }) => {
-  const [currentView, setCurrentView] = useState<string>('home');
+  const [currentView, setCurrentView] = useState<string>(() => {
+    const saved = localStorage.getItem('keyhaven_current_view');
+    return saved ? saved : 'home';
+  });
   const [allProperties, setAllProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<PropertyFilters>(defaultFilters);
@@ -307,6 +310,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ listings = [], isLoading = false,
     setAdminToken(token); 
     setIsAdmin(true); 
     localStorage.setItem('keyhaven_admin_token', token); 
+localStorage.setItem('keyhaven_current_view', 'admin');
     setCurrentView('admin');
   };
 
@@ -314,6 +318,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ listings = [], isLoading = false,
     setAdminToken(null); 
     setIsAdmin(false); 
     localStorage.removeItem('keyhaven_admin_token'); 
+localStorage.removeItem('keyhaven_current_view');
     setCurrentView('home');
   };
 
@@ -322,6 +327,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ listings = [], isLoading = false,
     setIsAdmin(false); 
     localStorage.removeItem('keyhaven_admin_token'); 
     setCurrentView('home'); 
+localStorage.removeItem('keyhaven_current_view');
     setShowLoginModal(true);
   };
 
