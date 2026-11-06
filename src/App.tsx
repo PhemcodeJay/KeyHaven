@@ -20,7 +20,8 @@ const mockRentals = [
     beds: 2,
     baths: 2,
     image: "https://via.placeholder.com/400",
-    source: "mock-zillow"
+    source: "mock-zillow",
+    listing_type: "rent"
   },
   {
     id: 2,
@@ -30,7 +31,8 @@ const mockRentals = [
     beds: 1,
     baths: 1,
     image: "https://via.placeholder.com/400",
-    source: "mock-zillow"
+    source: "mock-zillow",
+    listing_type: "rent"
   }
 ];
 
@@ -43,7 +45,9 @@ const mockCommercial = [
     beds: 0,
     baths: 2,
     image: "https://via.placeholder.com/400",
-    source: "mock-loopnet"
+    source: "mock-loopnet",
+    listing_type: "lease",
+    property_type: "commercial"
   },
   {
     id: 2,
@@ -53,7 +57,9 @@ const mockCommercial = [
     beds: 0,
     baths: 1,
     image: "https://via.placeholder.com/400",
-    source: "mock-loopnet"
+    source: "mock-loopnet",
+    listing_type: "lease",
+    property_type: "commercial"
   }
 ];
 
