@@ -1,45 +1,68 @@
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
+const rateLimit = require("express-rate-limit");
 const path = require("path");
 require("dotenv").config();
 
 const app = express();
+
+// Rate limiting: 100 requests per 15 minutes per IP
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { error: "Too many requests from this IP, please try again later." }
+});
+app.use(limiter);
+
 app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3001;
 
-// ⚠️ move this to .env in production
-const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY || "YOUR_RAPIDAPI_KEY";
+// RapidAPI key - required from environment (no fallback)
+const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
+if (!RAPIDAPI_KEY) {
+  console.error("❌ RAPIDAPI_KEY environment variable is required");
+  process.exit(1);
+}
 
-// Simple in-memory cache
-const cache = {
-  axesso: new Map(),
-  loopnet: new Map()
-};
+// Supabase client initialization
+const { createClient } = require("@supabase/supabase-js");
+const supabase = createClient(
+  process.env.SUPABASE_URL || "https://qneeldfsysuhlzfpvkwb.databasepad.com",
+  process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjJhNDVhMzZjLTkyMWUtNGMzZi1hNTgyLTg4NmRkYjM5ZTkyOSJ9.eyJwcm9qZWN0SWQiOiJxbmVlbGRmc3lzdWhsemZwdmt3YiIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzcxNjI5NzA3LCJleHAiOjIwODY5ODk3MDcsImlzcyI6ImZhbW91cy5kYXRhYmFzZXBhZCIsImF1ZCI6ImZhbW91cy5jbGllbnRzIn0"
+);
 
-// Admin credentials
-const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "admin123";
+// Admin credentials from environment
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+
+// Sessions store
 const sessions = new Map();
 
 // Cache duration: 5 minutes (300000 ms)
 const CACHE_DURATION = 5 * 60 * 1000;
 
-console.log("✅ Server configuration loaded");
-console.log(`🔑 RapidAPI Key: ${RAPIDAPI_KEY ? RAPIDAPI_KEY.substring(0, 10) + '...' : 'NOT SET'}`);
+console.log("✅ Server configuration loaded - UPDATED");
+console.log(`🔑 RapidAPI Key: ${RAPIDAPI_KEY.substring(0, 10)}...`);
+console.log(`📡 Supabase connected: ${process.env.SUPABASE_URL || 'localhost'}`);
 
-// === Mock Data Generators ===
+// Supabase data queries (replaces mock generators)
 
-function getMockAxessoData() {
-  return [
-    {
-      id: "axesso-mock-1",
-      title: "Luxury Apartment with City Views",
-      description: "Beautiful apartment with modern amenities, pool, and gym access. Close to shopping and dining.",
-      price: 3200,
-      bedrooms: 2,
+async function getAxessoPropertiesFromSupabase() {
+  try {
+    const { data, error } = await supabase
+      .from('properties')
+      .select('*')
+      .eq('source', 'axesso');
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error("Error fetching axesso properties:", error);
+    return [];
+  }
+}
       bathrooms: 2,
       sqft: 1200,
       address: "123 Main St, Los Angeles, CA 90210",
@@ -655,46 +678,19 @@ function getMockAxessoData() {
   ];
 }
 
-function getMockLoopNetData() {
-  return [
-    {
-      id: "loopnet-mock-1",
-      title: "Downtown Office Space",
-      description: "Prime office location in business district with modern amenities and parking.",
-      price: 8500,
-      bedrooms: 0,
-      bathrooms: 2,
-      sqft: 3500,
-      address: "100 Business Center Dr, Los Angeles, CA 90001",
-      city: "Los Angeles",
-      state: "CA",
-      zip: "90001",
-      country: "USA",
-      property_type: "commercial",
-      listing_type: "lease",
-      images: ["https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=400"],
-      status: "active",
-      date_listed: new Date().toISOString(),
-      latitude: 34.0522,
-      longitude: -118.2437,
-      source: "mock",
-      price_period: "monthly"
-    },
-    {
-      id: "loopnet-mock-dubai",
-      title: "Sheikh Zayed Road Office",
-      description: "Premium office suite in a landmark skyscraper with breathtaking views.",
-      price: 15000,
-      bedrooms: 0,
-      bathrooms: 4,
-      sqft: 5000,
-      address: "Sheikh Zayed Rd, Dubai, UAE",
-      city: "Dubai",
-      state: "Dubai",
-      zip: "00000",
-      country: "UAE",
-      property_type: "commercial",
-      listing_type: "lease",
+async function getLoopNetPropertiesFromSupabase() {
+  try {
+    const { data, error } = await supabase
+      .from('properties')
+      .select('*')
+      .eq('source', 'loopnet');
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error("Error fetching loopnet properties from Supabase:", error);
+    return [];
+  }
+}
       images: ["https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400"],
       status: "active",
       date_listed: new Date().toISOString(),
