@@ -1147,7 +1147,15 @@ app.get("/properties", async (req, res) => {
     
     console.log(`\n📦 Properties Request: location="${location}", type=${type}`);
     
-    let allProperties = [...getMockAxessoData(), ...getMockLoopNetData()];
+    let allProperties = []
+
+    // Fetch axesso properties from Supabase
+    const axessoProps = await getAxessoPropertiesFromSupabase()
+    allProperties = [...allProperties, ...axessoProps]
+
+    // Fetch loopnet properties from Supabase
+    const loopnetProps = await getLoopNetPropertiesFromSupabase()
+    allProperties = [...allProperties, ...loopnetProps]
 
     // Filter by type if specified
     if (type !== 'all') {
@@ -1185,8 +1193,8 @@ app.get("/properties", async (req, res) => {
   } catch (error) {
     console.error("Properties API Error:", error);
     res.json({ 
-      results: getMockAxessoData(),
-      total: 6,
+      results: [],
+      total: 0,
       source: "error fallback"
     });
   }
@@ -1213,7 +1221,15 @@ app.post("/admin/properties", (req, res) => {
   const { action, page = 1, per_page = 10, source = 'all' } = req.body;
   
   if (action === 'list_properties') {
-    let allProperties = [...getMockAxessoData(), ...getMockLoopNetData()];
+    let allProperties = []
+
+    // Fetch axesso properties from Supabase
+    const axessoProps = await getAxessoPropertiesFromSupabase()
+    allProperties = [...allProperties, ...axessoProps]
+
+    // Fetch loopnet properties from Supabase
+    const loopnetProps = await getLoopNetPropertiesFromSupabase()
+    allProperties = [...allProperties, ...loopnetProps];
     
     if (source !== 'all') {
       allProperties = allProperties.filter(p => {
