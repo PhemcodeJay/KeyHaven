@@ -36,31 +36,50 @@ const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=Hi%2C%20I%20am%20inte
 
 // Helper functions for data transformation - defined outside component to avoid initialization issues
 const determinePropertyType = (data: any): string => {
-  if (data.propertyType?.toLowerCase().includes('commercial') || 
+  const propertyType = (data.propertyType || data.property_type || '').toLowerCase();
+
+  // Commercial properties
+  if (propertyType.includes('commercial') || 
       data.propertyType?.toLowerCase().includes('office') ||
       data.propertyType?.toLowerCase().includes('retail')) {
     return 'commercial';
   }
-  if (data.propertyType?.toLowerCase().includes('apartment')) {
+  if (propertyType.includes('apartment') ||
+      propertyType.includes('condo') ||
+      propertyType.includes('co-op')) {
     return 'apartment';
   }
-  if (data.propertyType?.toLowerCase().includes('condo')) {
-    return 'condo';
-  }
-  if (data.propertyType?.toLowerCase().includes('townhouse')) {
+
+  if (propertyType.includes('townhouse') ||
+      propertyType.includes('rowhouse')) {
     return 'townhouse';
   }
+
+  if (propertyType.includes('house') ||
+      propertyType.includes('villa') ||
+      propertyType.includes('home')) {
+    return 'house';
+  }
+
+  if (propertyType.includes('land') ||
+      propertyType.includes('plot')) {
+    return 'land';
+  }
+
+  // Default to house if no match
   return 'house';
 };
 
 const determineListingType = (data: any, propertyType: string): string => {
   // If it's commercial property, it's likely a lease
-  if (propertyType === 'commercial' || 
+  if (normalizedPropertyType === 'commercial' || 
       data.listingType?.toLowerCase().includes('lease') ||
-      data.listingType?.toLowerCase().includes('commercial')) {
+      data.listingType?.toLowerCase().includes('commercial') ||
+      data.listingType?.toLowerCase().includes('office')) {
     return 'lease';
   }
-  // Default to rent
+
+  // Default to rent for residential properties
   return 'rent';
 };
 
