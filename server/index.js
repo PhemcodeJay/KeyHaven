@@ -170,7 +170,7 @@ app.post("/admin/login", (req, res) => {
   }
 });
 
-app.post("/admin/properties", (req, res) => {
+app.post("/admin/properties", async (req, res) => {
   const token = req.headers.authorization;
   if (!sessions.has(token)) {
     return res.status(401).json({ error: "Unauthorized. Please login again." });

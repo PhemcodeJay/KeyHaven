@@ -72,7 +72,7 @@ const determinePropertyType = (data: any): string => {
 
 const determineListingType = (data: any, propertyType: string): string => {
   // If it's commercial property, it's likely a lease
-  if (normalizedPropertyType === 'commercial' || 
+  if (propertyType === 'commercial' || 
       data.listingType?.toLowerCase().includes('lease') ||
       data.listingType?.toLowerCase().includes('commercial') ||
       data.listingType?.toLowerCase().includes('office')) {
