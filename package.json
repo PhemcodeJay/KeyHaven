@@ -92,8 +92,9 @@
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^8.3.6",
-    "engines": {
+"engines": {
       "node": "20.x"
     }
+    
   }
 }
