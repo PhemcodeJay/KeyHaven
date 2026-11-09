@@ -1,12 +1,14 @@
 import React from 'react';
 import { Property } from '@/types/property';
-import { MapPin, Bed, Bath, Maximize, Heart, ExternalLink, Building2, Home } from 'lucide-react';
+import { MapPin, Bed, Bath, Maximize, Heart, ExternalLink, Building2, Home, Phone, Mail, Sparkles, Zap } from 'lucide-react';
 
 interface PropertyCardProps {
   property: Property;
   onSelect: (property: Property) => void;
   onToggleFavorite?: (id: string) => void;
   isFavorite?: boolean;
+  onRequestQuote?: (property: Property) => void;
+  onMakeEnquiry?: (property: Property) => void;
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property, onSelect, onToggleFavorite, isFavorite }) => {
@@ -37,6 +39,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onSelect, onToggl
   const sourceBadge = getSourceBadge(property.source);
 
   const TypeIcon = property.listing_type === 'lease' ? Building2 : Home;
+
+  const isRent = property.listing_type === 'rent';
+  const isCommercial = property.property_type === 'commercial' || property.listing_type === 'lease';
 
   return (
     <div
@@ -78,6 +83,34 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onSelect, onToggl
             size={18}
           />
         </button>
+
+        {/* Quote Button - for rent properties */}
+        {isRent && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRequestQuote?.(property);
+            }}
+            className="absolute top-3 right-3 w-9 h-9 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition-colors shadow-lg mb-1"
+            title="Get Rent Quote"
+          >
+            <Sparkles className="w-4.5 h-4.5" />
+          </button>
+        )}
+
+        {/* Enquiries Button - for commercial properties */}
+        {isCommercial && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onMakeEnquiry?.(property);
+            }}
+            className="absolute top-3 right-3 w-9 h-9 rounded-full bg-orange-500 text-white flex items-center justify-center hover:bg-orange-600 transition-colors shadow-lg mb-1"
+            title="Make Enquiry"
+          >
+            <Mail className="w-4.5 h-4.5" />
+          </button>
+        )}
 
         {/* Price */}
         <div className="absolute bottom-3 left-3">
