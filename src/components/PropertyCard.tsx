@@ -11,7 +11,7 @@ interface PropertyCardProps {
   onMakeEnquiry?: (property: Property) => void;
 }
 
-const PropertyCard: React.FC<PropertyCardProps> = ({ property, onSelect, onToggleFavorite, isFavorite }) => {
+const PropertyCard: React.FC<PropertyCardProps> = ({ property, onSelect, onToggleFavorite, isFavorite, onRequestQuote, onMakeEnquiry }) => {
   const formatPrice = (price: number, period: string) => {
     if (price >= 10000) {
       return `$${(price / 1000).toFixed(1)}k`;
