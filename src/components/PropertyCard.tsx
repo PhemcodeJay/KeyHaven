@@ -132,7 +132,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, onSelect, onToggl
 
         <div className="flex items-center gap-1 text-gray-500 text-xs mb-3">
           <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-          <span className="truncate">{property.city}{property.state ? `, ${property.state}` : ''}</span>
+          <span className="truncate">
+            {property.city}
+            {property.state && `${property.state}`}
+            {property.country && property.city && property.state ? ', ' : ''}
+            {property.country && `${property.country}` }
+          </span>
         </div>
 
         {/* Specs */}

@@ -18,7 +18,7 @@ app.use(limiter);
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 6000;
 
 // RapidAPI key - required from environment (no fallback)
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
